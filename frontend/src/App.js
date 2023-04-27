@@ -1,10 +1,9 @@
 // Importing modules
 import React, { useState, useEffect } from "react";
 import "./App.css";
+import Tile from "./components/Tile";
 
-import { Alignment, Navbar, Button, Card, Elevation } from "@blueprintjs/core";
-import '@blueprintjs/core/lib/css/blueprint.css';
-
+import axios from "axios";
 
 function App() {
   // usestate for setting a javascript
@@ -15,6 +14,61 @@ function App() {
     date: "",
     programming: "",
   });
+
+  const CLIENT_ID = "268fc0cf3a024f2a8b409bbdb8095567";
+  const REDIRECT_URI = "http://localhost:3000";
+  const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
+  const RESPONSE_TYPE = "token";
+
+  const [token, setToken] = useState("")
+
+  useEffect(() => {
+    const hash = window.location.hash
+    let token = window.localStorage.getItem("token")
+
+    if (!token && hash) {
+      token = hash.substring(1).split("&").find(elem => elem.startsWith("access_token")).split("=")[1]
+
+      window.location.hash = ""
+      window.localStorage.setItem("token", token)
+    }
+
+    setToken(token)
+
+  }, [])
+
+  const logout = () => {
+    setToken("")
+    window.localStorage.removeItem("token")
+  }
+
+  const [searchKey, setSearchKey] = useState("")
+  const [artists, setArtists] = useState([])
+
+  const searchArtists = async (e) => {
+    e.preventDefault()
+    const { data } = await axios.get("https://api.spotify.com/v1/search", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: {
+        q: searchKey,
+        type: "artist"
+      }
+    })
+
+    setArtists(data.artists.items)
+  }
+
+  const renderArtists = () => {
+    return artists.map(artist => (
+      <div key={artist.id}>
+        {artist.images.length ? <img width={"50%"} src={artist.images[0].url} alt="" /> : <div>No Image</div>}
+        {artist.name}
+      </div>
+    ))
+  }
+
 
   // Using useEffect for single rendering
   useEffect(() => {
@@ -35,31 +89,44 @@ function App() {
 
   return (
     <div className="App">
-      <Navbar>
-        <Navbar.Group align={Alignment.LEFT}>
-          <Navbar.Heading>Spotify Analysis</Navbar.Heading>
-          <Navbar.Divider />
-          <Button className="bp4-minimal" icon="home" text="Home" />
-          <Button className="bp4-minimal" icon="document" text="Files" />
-        </Navbar.Group>
-      </Navbar>
 
-      <header className="App-header">
-        <h1>React and flask</h1>
-        {/* Calling a data from setdata for showing */}
-        <p>{data.name}</p>
-        <p>{data.age}</p>
-        <p>{data.date}</p>
-        <p>{data.programming}</p>
-      </header>
+      <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand">Spotify Analyser</a>
+          {!token ?
+            <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>Login
+              to Spotify</a>
+            : <button className="btn btn-secondary" onClick={logout}>Logout</button>}
+        </div>
+      </nav>
 
-      <Card interactive={false} elevation={Elevation.ONE}>
-        <h5><a href="#">Card heading</a></h5>
-        <p>Card content</p>
-        <Button>Submit</Button>
-      </Card>
+      <div className="container my-3">
 
-      <Button intent="success" text="button content" />
+        <div className="row">
+
+          <div className="col-lg-6">
+            <Tile headerText="Top Songs" data={data} />
+          </div>
+
+          <div className="col-lg-6">
+            <Tile headerText="Top Artists By Month" data={data} />
+          </div>
+
+        </div>
+
+        <div className="row">
+          <form onSubmit={searchArtists}>
+            <input type="text" onChange={e => setSearchKey(e.target.value)} />
+            <button type={"submit"}>Search</button>
+          </form>
+        </div>
+
+        <div className="row">
+          {renderArtists()}
+        </div>
+
+      </div>
+
     </div>
   );
 }
