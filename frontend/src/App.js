@@ -1,7 +1,9 @@
 // Importing modules
 import React, { useState, useEffect } from "react";
 import "./App.css";
+
 import Tile from "./components/Tile";
+import TopItemsTable from "./components/TopItemsTable";
 
 import axios from "axios";
 
@@ -42,31 +44,22 @@ function App() {
     window.localStorage.removeItem("token")
   }
 
-  const [searchKey, setSearchKey] = useState("")
-  const [artists, setArtists] = useState([])
+  const [topArtists, setTopArtists] = useState([])
 
-  const searchArtists = async (e) => {
+  const getArtists = async (e) => {
     e.preventDefault()
-    const { data } = await axios.get("https://api.spotify.com/v1/search", {
+    const { data } = await axios.get("https://api.spotify.com/v1/me/top/artists", {
       headers: {
         Authorization: `Bearer ${token}`
       },
       params: {
-        q: searchKey,
-        type: "artist"
+        limit: "5",
+        offset: "0",
+        time_range: "short_term"
       }
     })
 
-    setArtists(data.artists.items)
-  }
-
-  const renderArtists = () => {
-    return artists.map(artist => (
-      <div key={artist.id}>
-        {artist.images.length ? <img width={"50%"} src={artist.images[0].url} alt="" /> : <div>No Image</div>}
-        {artist.name}
-      </div>
-    ))
+    setTopArtists(data['items'])
   }
 
 
@@ -94,8 +87,9 @@ function App() {
         <div class="container-fluid">
           <a class="navbar-brand">Spotify Analyser</a>
           {!token ?
-            <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>Login
-              to Spotify</a>
+            <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=user-top-read`}>
+              <button className="btn btn-secondary">Login to Spotify</button>
+            </a>
             : <button className="btn btn-secondary" onClick={logout}>Logout</button>}
         </div>
       </nav>
@@ -115,14 +109,13 @@ function App() {
         </div>
 
         <div className="row">
-          <form onSubmit={searchArtists}>
-            <input type="text" onChange={e => setSearchKey(e.target.value)} />
+          <form onSubmit={getArtists}>
             <button type={"submit"}>Search</button>
           </form>
         </div>
 
         <div className="row">
-          {renderArtists()}
+          <TopItemsTable topArtistsJson={topArtists} />
         </div>
 
       </div>
