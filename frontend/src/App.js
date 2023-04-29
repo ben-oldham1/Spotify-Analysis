@@ -2,8 +2,14 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 
-import Tile from "./components/Tile";
-import TopItemsTable from "./components/TopItemsTable";
+import TopArtistsTable from "./components/TopArtistsTable";
+import Alert from "./components/Alert";
+
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 import axios from "axios";
 
@@ -45,8 +51,10 @@ function App() {
   }
 
   const [topArtists, setTopArtists] = useState([])
+  const [topSongs, setTopSongs] = useState([])
+  const [apiError, setApiError] = useState([])
 
-  const getArtists = async (e) => {
+  const getTopArtists = async (e) => {
     e.preventDefault()
     const { data } = await axios.get("https://api.spotify.com/v1/me/top/artists", {
       headers: {
@@ -57,9 +65,25 @@ function App() {
         offset: "0",
         time_range: "short_term"
       }
+    }).catch(function (error) {
+      setApiError(true)
     })
-
     setTopArtists(data['items'])
+  }
+
+  const getTopSongs = async (e) => {
+    e.preventDefault()
+    const { data } = await axios.get("https://api.spotify.com/v1/me/top/tracks", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: {
+        limit: "5",
+        offset: "0",
+        time_range: "short_term"
+      }
+    })
+    setTopSongs(data['items'])
   }
 
 
@@ -94,31 +118,40 @@ function App() {
         </div>
       </nav>
 
-      <div className="container my-3">
+      <Container>
 
-        <div className="row">
+        <Row>
 
-          <div className="col-lg-6">
-            <Tile headerText="Top Songs" data={data} />
-          </div>
+          <Col>
+            <Card>
+              <Card.Header>Top artists</Card.Header>
+              <Card.Body>
+                <Card.Text>
+                  With supporting text below as a natural lead-in to additional content.
+                </Card.Text>
 
-          <div className="col-lg-6">
-            <Tile headerText="Top Artists By Month" data={data} />
-          </div>
+                <TopArtistsTable topArtistsJson={topArtists} />
 
-        </div>
+                <Button variant="primary">Go somewhere</Button>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col>
+           <p>another col</p>
+          </Col>
 
-        <div className="row">
-          <form onSubmit={getArtists}>
-            <button type={"submit"}>Search</button>
+        </Row>
+
+        <Row>
+          <form onSubmit={getTopArtists}>
+            <button className="btn btn-primary" type={"submit"}>Get top artists</button>
           </form>
-        </div>
+          <form onSubmit={getTopSongs}>
+            <button className="btn btn-secondary" type={"submit"}>Get top songs</button>
+          </form>
+        </Row>
 
-        <div className="row">
-          <TopItemsTable topArtistsJson={topArtists} />
-        </div>
-
-      </div>
+      </Container>
 
     </div>
   );
