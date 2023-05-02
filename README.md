@@ -2,7 +2,7 @@
 ## Aims & Objectives
 The aim of this project is to improve my React skills, by creating a basic application.
 ## Background
-Spotify exposes a wide selection of data through its web API. You can retrieve data such as a user's top artists and tracks (which requires OAuth2 authentication). 
+Spotify exposes a wide selection of data through its web API. You can retrieve data such as a user's top artists and tracks (which requires OAuth2 authentication for security). 
 
 # Using the App
 ## Download & Setup
