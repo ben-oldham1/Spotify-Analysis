@@ -4,7 +4,7 @@ import Table from 'react-bootstrap/Table';
 
 function TopArtistsTable(props) {
   return (
-    <Table striped bordered hover>
+    <Table className="px-0" striped bordered hover>
       <thead>
         <tr>
           <th>#</th>
@@ -18,7 +18,7 @@ function TopArtistsTable(props) {
 
           <tr key={topArtist.id}>
             <th>
-              <img src={topArtist.images[1].url} width='60px'></img>
+              <img src={topArtist.images[1].url} width='50px'></img>
             </th>
             <td>{topArtist.name}</td>
             <td>{topArtist.popularity}</td>
