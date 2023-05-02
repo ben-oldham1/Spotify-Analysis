@@ -10,20 +10,18 @@ function TopArtistsTable(props) {
           <th>#</th>
           <th>Name</th>
           <th>Popularity</th>
-          <th>ID</th>
         </tr>
       </thead>
 
       <tbody>
         {props.topArtistsJson.map(topArtist =>
 
-          <tr>
+          <tr key={topArtist.id}>
             <th>
               <img src={topArtist.images[1].url} width='60px'></img>
             </th>
             <td>{topArtist.name}</td>
             <td>{topArtist.popularity}</td>
-            <td>{topArtist.id}</td>
           </tr>
 
         )}
