@@ -4,6 +4,7 @@ import "./App.css";
 
 import TopArtistsTable from "./components/TopArtistsTable";
 import AlertDismissible from "./components/Alert";
+import TopArtists from "./components/TopArtists";
 
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -12,6 +13,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
 import Stack from 'react-bootstrap/Stack';
+
+import { ReactComponent as Wave1 } from './components/Wave1.svg';
 
 import axios from "axios";
 
@@ -87,7 +90,7 @@ function App() {
         Authorization: `Bearer ${token}`
       },
       params: {
-        limit: "5",
+        limit: "3",
         offset: "0",
         time_range: "short_term"
       },
@@ -104,6 +107,7 @@ function App() {
     setIsLoading(false);
   }
 
+  // Gets the top tracks for a user
   const getTopSongs = async (e) => {
     e.preventDefault()
     const { data } = await axios.get("https://api.spotify.com/v1/me/top/tracks", {
@@ -149,75 +153,85 @@ function App() {
       <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
           <a class="navbar-brand">Spotify Analyser</a>
+
           {!token ?
             <button className="btn btn-secondary" onClick={login}>
               Login to Spotify
             </button>
 
-
             : <button className="btn btn-secondary" onClick={logout}>Logout</button>
           }
+
         </div>
       </nav>
 
-      <Container>
 
-        {apiError ?
-          <Row>
-            <AlertDismissible headerText="Error" bodyText="An error has occcured while accessing your Spotify data. Try again!" apiError={apiError} setApiError={setApiError} />
-          </Row>
-          : null
-        }
+      {!token ?
+        <div className="my-5 text-center">
+          <h3>Login to Spotify to get started!</h3>
+        </div>
+        :
+        <>
 
-        {!token ?
-          <div className="my-5 text-center">
-            <h3>Login to Spotify to get started!</h3>
-          </div>
-          :
-          <>
-            <Row>
+          <Container>
 
-              <Col>
-                <Card>
-                  <Card.Header>Top artists</Card.Header>
-                  <Card.Body>
-                    <Container>
+            {apiError ?
+              <Row>
+                <AlertDismissible headerText="Error" bodyText="An error has occcured while accessing your Spotify data. Try again!" apiError={apiError} setApiError={setApiError} />
+              </Row>
+              : null
+            }
 
-                      <Row>
-                        <Col style={{ overflow: "auto" }}>
-                          {isLoading ?
-                            <div>
-                              <Spinner animation="border" role="status" />
-                              <p>Getting your data...</p>
-                            </div>
-                            : null}
-                          <TopArtistsTable topArtistsJson={topArtists} />
-                        </Col>
-                      </Row>
+            <div className="py-5">
+              <Row className="mb-3">
+                <Col>
+                  <h1 className="text-center">Your top artists</h1>
+                </Col>
+              </Row>
 
-                    </Container>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col>
-                <p>another col</p>
-              </Col>
+              <Row>
+                {isLoading ?
+                  <div>
+                    <Spinner animation="border" role="status" />
+                    <p>Getting your data...</p>
+                  </div>
+                  : null}
+                <TopArtists topArtistsJson={topArtists} />
+              </Row>
 
-            </Row>
-
-            <Row>
               <form onSubmit={getTopArtists}>
-                <button className="btn btn-primary" type={"submit"}>Get top artists</button>
+                  <button className="btn btn-primary" type={"submit"}>Get top Artists</button>
               </form>
-              <form onSubmit={getTopSongs}>
-                <button className="btn btn-secondary" type={"submit"}>Get top songs</button>
-              </form>
-            </Row>
-          </>
-        }
+            </div>
+
+          </Container>
+
+          <Wave1 />
+
+          <div className="bg-dark">
+            <Container>
+
+              <div className="py-5">
+                <Row className="mb-3">
+                  <Col>
+                    <h1 className="text-center text-white">Top Genres</h1>
+                  </Col>
+                </Row>
+              </div>
+
+              <Row>
+                <form onSubmit={getTopSongs}>
+                  <button className="btn btn-secondary" type={"submit"}>Get top songs</button>
+                </form>
+              </Row>
+
+            </Container>
+          </div>
+
+        </>
+      }
 
 
-      </Container>
 
     </div>
   );
