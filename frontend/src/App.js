@@ -3,13 +3,15 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 
 import TopArtistsTable from "./components/TopArtistsTable";
-import Alert from "./components/Alert";
+import AlertDismissible from "./components/Alert";
 
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Spinner from 'react-bootstrap/Spinner';
+import Stack from 'react-bootstrap/Stack';
 
 import axios from "axios";
 
@@ -23,10 +25,13 @@ function App() {
     programming: "",
   });
 
+  // ========== AUTHENTICATION LOGIC ==========
+
   const CLIENT_ID = "268fc0cf3a024f2a8b409bbdb8095567";
   const REDIRECT_URI = "http://localhost:3000";
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
   const RESPONSE_TYPE = "token";
+  const SCOPE = "user-top-read";
 
   const [token, setToken] = useState("")
 
@@ -45,17 +50,38 @@ function App() {
 
   }, [])
 
+  // Function to log the user into Spotify
+  function login() {
+    // Construct the authorisation URL, where users can grant my app access to spotify
+    const authUrl = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}`;
+
+    // Redirect page to the URL above
+    window.location.href = authUrl;
+  }
+
+  // Removes the authorisation token, thus logging the user out from Spotify
   const logout = () => {
     setToken("")
     window.sessionStorage.removeItem("token")
   }
 
+
+  // ========== DATA FETCHING LOGIC ==========
+
+  const [apiError, setApiError] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+
   const [topArtists, setTopArtists] = useState([])
   const [topSongs, setTopSongs] = useState([])
-  const [apiError, setApiError] = useState([])
 
+  // Gets the top artists for a user
   const getTopArtists = async (e) => {
     e.preventDefault()
+
+    // Renders a loading message while we get the data
+    setIsLoading(true);
+
+    // Make API call
     const { data } = await axios.get("https://api.spotify.com/v1/me/top/artists", {
       headers: {
         Authorization: `Bearer ${token}`
@@ -64,27 +90,18 @@ function App() {
         limit: "5",
         offset: "0",
         time_range: "short_term"
-      }
+      },
+      timeout: 5000
     }).catch(function (error) {
+      // This will render an alert so the user knows there has been an error
       setApiError(true)
+      setIsLoading(false);
     })
-    setTopArtists(data['items'])
-  }
 
-  const login = async (e) => {
-    e.preventDefault()
-    const { data } = await axios.get(AUTH_ENDPOINT, {
-      headers: {},
-      params: {
-        client_id: CLIENT_ID,
-        redirect_uri: REDIRECT_URI,
-        response_type: RESPONSE_TYPE,
-        scope: 'user-top-read'
-      }
-    }).catch(function (error) {
-      console.log('Error logging into spotify')
-    })
-    console.log('Login success!!!!')
+    // Store the response in TopArtists state
+    setTopArtists(data['items'])
+
+    setIsLoading(false);
   }
 
   const getTopSongs = async (e) => {
@@ -97,8 +114,14 @@ function App() {
         limit: "5",
         offset: "0",
         time_range: "short_term"
-      }
+      },
+      timeout: 5000
+    }).catch(function (error) {
+      // This will render an alert so the user knows there has been an error
+      setApiError(true)
+      setIsLoading(false);
     })
+
     setTopSongs(data['items'])
   }
 
@@ -127,47 +150,72 @@ function App() {
         <div class="container-fluid">
           <a class="navbar-brand">Spotify Analyser</a>
           {!token ?
-            <a href={`${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=user-top-read`}>
-              <button className="btn btn-secondary">Login to Spotify</button>
-            </a>
-            : <button className="btn btn-secondary" onClick={logout}>Logout</button>}
+            <button className="btn btn-secondary" onClick={login}>
+              Login to Spotify
+            </button>
+
+
+            : <button className="btn btn-secondary" onClick={logout}>Logout</button>
+          }
         </div>
       </nav>
 
       <Container>
 
-        <Row>
+        {apiError ?
+          <Row>
+            <AlertDismissible headerText="Error" bodyText="An error has occcured while accessing your Spotify data. Try again!" apiError={apiError} setApiError={setApiError} />
+          </Row>
+          : null
+        }
 
-          <Col>
-            <Card>
-              <Card.Header>Top artists</Card.Header>
-              <Card.Body>
-                <Container>
+        {!token ?
+          <div className="my-5 text-center">
+            <h3>Login to Spotify to get started!</h3>
+          </div>
+          :
+          <>
+            <Row>
 
-                  <Row>
-                    <Col style={{ overflow: "auto" }}>
-                      <TopArtistsTable topArtistsJson={topArtists} />
-                    </Col>
-                  </Row>
+              <Col>
+                <Card>
+                  <Card.Header>Top artists</Card.Header>
+                  <Card.Body>
+                    <Container>
 
-                </Container>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col>
-            <p>another col</p>
-          </Col>
+                      <Row>
+                        <Col style={{ overflow: "auto" }}>
+                          {isLoading ?
+                            <div>
+                              <Spinner animation="border" role="status" />
+                              <p>Getting your data...</p>
+                            </div>
+                            : null}
+                          <TopArtistsTable topArtistsJson={topArtists} />
+                        </Col>
+                      </Row>
 
-        </Row>
+                    </Container>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col>
+                <p>another col</p>
+              </Col>
 
-        <Row>
-          <form onSubmit={getTopArtists}>
-            <button className="btn btn-primary" type={"submit"}>Get top artists</button>
-          </form>
-          <form onSubmit={getTopSongs}>
-            <button className="btn btn-secondary" type={"submit"}>Get top songs</button>
-          </form>
-        </Row>
+            </Row>
+
+            <Row>
+              <form onSubmit={getTopArtists}>
+                <button className="btn btn-primary" type={"submit"}>Get top artists</button>
+              </form>
+              <form onSubmit={getTopSongs}>
+                <button className="btn btn-secondary" type={"submit"}>Get top songs</button>
+              </form>
+            </Row>
+          </>
+        }
+
 
       </Container>
 
