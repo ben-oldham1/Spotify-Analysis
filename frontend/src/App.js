@@ -32,13 +32,13 @@ function App() {
 
   useEffect(() => {
     const hash = window.location.hash
-    let token = window.localStorage.getItem("token")
+    let token = window.sessionStorage.getItem("token")
 
     if (!token && hash) {
       token = hash.substring(1).split("&").find(elem => elem.startsWith("access_token")).split("=")[1]
 
       window.location.hash = ""
-      window.localStorage.setItem("token", token)
+      window.sessionStorage.setItem("token", token)
     }
 
     setToken(token)
@@ -47,7 +47,7 @@ function App() {
 
   const logout = () => {
     setToken("")
-    window.localStorage.removeItem("token")
+    window.sessionStorage.removeItem("token")
   }
 
   const [topArtists, setTopArtists] = useState([])
@@ -69,6 +69,22 @@ function App() {
       setApiError(true)
     })
     setTopArtists(data['items'])
+  }
+
+  const login = async (e) => {
+    e.preventDefault()
+    const { data } = await axios.get(AUTH_ENDPOINT, {
+      headers: {},
+      params: {
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI,
+        response_type: RESPONSE_TYPE,
+        scope: 'user-top-read'
+      }
+    }).catch(function (error) {
+      console.log('Error logging into spotify')
+    })
+    console.log('Login success!!!!')
   }
 
   const getTopSongs = async (e) => {
@@ -126,18 +142,20 @@ function App() {
             <Card>
               <Card.Header>Top artists</Card.Header>
               <Card.Body>
-                <Card.Text>
-                  With supporting text below as a natural lead-in to additional content.
-                </Card.Text>
+                <Container>
 
-                <TopArtistsTable topArtistsJson={topArtists} />
+                  <Row>
+                    <Col style={{ overflow: "auto" }}>
+                      <TopArtistsTable topArtistsJson={topArtists} />
+                    </Col>
+                  </Row>
 
-                <Button variant="primary">Go somewhere</Button>
+                </Container>
               </Card.Body>
             </Card>
           </Col>
           <Col>
-           <p>another col</p>
+            <p>another col</p>
           </Col>
 
         </Row>
