@@ -5,6 +5,8 @@ import "./App.css";
 import TopArtistsTable from "./components/TopArtistsTable";
 import AlertDismissible from "./components/Alert";
 import TopArtists from "./components/TopArtists";
+import TopTracks from "./components/TopTracks";
+import GenreChart from "./components/GenreChart";
 
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -15,6 +17,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import Stack from 'react-bootstrap/Stack';
 
 import { ReactComponent as Wave1 } from './components/Wave1.svg';
+import { ReactComponent as Wave2 } from './components/Wave2.svg';
 
 import axios from "axios";
 
@@ -75,7 +78,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [topArtists, setTopArtists] = useState([])
-  const [topSongs, setTopSongs] = useState([])
+  const [topTracks, setTopTracks] = useState([])
 
   // Gets the top artists for a user
   const getTopArtists = async (e) => {
@@ -92,7 +95,7 @@ function App() {
       params: {
         limit: "3",
         offset: "0",
-        time_range: "short_term"
+        time_range: "medium_term"
       },
       timeout: 5000
     }).catch(function (error) {
@@ -107,17 +110,22 @@ function App() {
     setIsLoading(false);
   }
 
-  // Gets the top tracks for a user
-  const getTopSongs = async (e) => {
+  // Gets the top artists for a user
+  const getTopTracks = async (e) => {
     e.preventDefault()
+
+    // Renders a loading message while we get the data
+    setIsLoading(true);
+
+    // Make API call
     const { data } = await axios.get("https://api.spotify.com/v1/me/top/tracks", {
       headers: {
         Authorization: `Bearer ${token}`
       },
       params: {
-        limit: "5",
+        limit: "6",
         offset: "0",
-        time_range: "short_term"
+        time_range: "medium_term"
       },
       timeout: 5000
     }).catch(function (error) {
@@ -126,26 +134,11 @@ function App() {
       setIsLoading(false);
     })
 
-    setTopSongs(data['items'])
+    // Store the response in TopArtists state
+    setTopTracks(data['items'])
+
+    setIsLoading(false);
   }
-
-
-  // Using useEffect for single rendering
-  useEffect(() => {
-    // Using fetch to fetch the api from
-    // flask server it will be redirected to proxy
-    fetch("/data").then((res) =>
-      res.json().then((data) => {
-        // Setting a data from api
-        setdata({
-          name: data.Name,
-          age: data.Age,
-          date: data.Date,
-          programming: data.programming,
-        });
-      })
-    );
-  }, []);
 
   return (
     <div className="App">
@@ -185,7 +178,7 @@ function App() {
             <div className="py-5">
               <Row className="mb-3">
                 <Col>
-                  <h1 className="text-center">Your top artists</h1>
+                  <h1 className="text-center">Top Artists</h1>
                 </Col>
               </Row>
 
@@ -200,7 +193,7 @@ function App() {
               </Row>
 
               <form onSubmit={getTopArtists}>
-                  <button className="btn btn-primary" type={"submit"}>Get top Artists</button>
+                <button className="btn btn-primary" type={"submit"}>Get top Artists</button>
               </form>
             </div>
 
@@ -214,19 +207,45 @@ function App() {
               <div className="py-5">
                 <Row className="mb-3">
                   <Col>
-                    <h1 className="text-center text-white">Top Genres</h1>
+                    <h1 className="text-center text-white">Top Tracks</h1>
                   </Col>
+                </Row>
+
+                <Row className="mb-3">
+                  {isLoading ?
+                    <div>
+                      <Spinner animation="border" role="status" />
+                      <p className="text-white">Getting your data...</p>
+                    </div>
+                    : null}
+
+                  <TopTracks topTracksJson={topTracks} />
+                </Row>
+
+                <Row>
+                  <form onSubmit={getTopTracks}>
+                    <button className="btn btn-secondary" type={"submit"}>Get top songs</button>
+                  </form>
                 </Row>
               </div>
 
-              <Row>
-                <form onSubmit={getTopSongs}>
-                  <button className="btn btn-secondary" type={"submit"}>Get top songs</button>
-                </form>
-              </Row>
-
             </Container>
           </div>
+
+          <Wave2 />
+
+          <Container>
+            <Row>
+              <Col className="text-center">
+                <h1>Top Genres</h1>
+              </Col>
+            </Row>
+            <Row>
+              <Col className="text-center">
+                <GenreChart />
+              </Col>
+            </Row>
+          </Container>
 
         </>
       }
