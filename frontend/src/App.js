@@ -79,6 +79,8 @@ function App() {
 
   const [topArtists, setTopArtists] = useState([])
   const [topTracks, setTopTracks] = useState([])
+  const [topGenre, setTopGenre] = useState([])
+
 
   // Gets the top artists for a user
   const getTopArtists = async (e) => {
@@ -111,6 +113,36 @@ function App() {
   }
 
   // Gets the top artists for a user
+  const getTopGenres = async (e) => {
+    e.preventDefault()
+
+    // Renders a loading message while we get the data
+    setIsLoading(true);
+
+    // Make API call
+    const { data } = await axios.get("https://api.spotify.com/v1/me/top/artists", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      params: {
+        limit: "10",
+        offset: "0",
+        time_range: "medium_term"
+      },
+      timeout: 5000
+    }).catch(function (error) {
+      // This will render an alert so the user knows there has been an error
+      setApiError(true)
+      setIsLoading(false);
+    })
+
+    // Store the response in TopArtists state
+    setTopGenre(data['items'])
+
+    setIsLoading(false);
+  }
+
+  // Gets the top tracks for a user
   const getTopTracks = async (e) => {
     e.preventDefault()
 
@@ -240,10 +272,17 @@ function App() {
                 <h1>Top Genres</h1>
               </Col>
             </Row>
+
             <Row>
               <Col className="text-center">
-                <GenreChart />
+                <GenreChart topGenreJson={topGenre} />
               </Col>
+            </Row>
+
+            <Row>
+              <form onSubmit={getTopGenres}>
+                <button className="btn btn-secondary" type={"submit"}>Get top genres</button>
+              </form>
             </Row>
           </Container>
 
