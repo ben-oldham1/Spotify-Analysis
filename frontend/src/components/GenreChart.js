@@ -75,12 +75,15 @@ export default function GenreChart(props) {
       margin={{ top: 100 }}
       getLabel={d => d.name}
       data={chartData}
-      labelsRadiusMultiplier={1.1}
+      labelsRadiusMultiplier={1.2}
       labelsStyle={{ fontSize: 12, fill: '#222' }}
+      radius={250}
+      innerRadius={175}
       showLabels
+      animation
       style={{ stroke: '#fff', strokeWidth: 2 }}
-      width={600}
-      height={600}
+      width={800}
+      height={800}
     />
   );
 }
