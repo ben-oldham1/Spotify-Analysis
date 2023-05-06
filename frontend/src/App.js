@@ -125,7 +125,7 @@ function App() {
         Authorization: `Bearer ${token}`
       },
       params: {
-        limit: "10",
+        limit: "8",
         offset: "0",
         time_range: "medium_term"
       },
