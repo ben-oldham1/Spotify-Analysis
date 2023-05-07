@@ -16,6 +16,8 @@ import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
 import Stack from 'react-bootstrap/Stack';
 
+import { Treemap } from 'react-vis';
+
 import { ReactComponent as Wave1 } from './components/Wave1.svg';
 import { ReactComponent as Wave2 } from './components/Wave2.svg';
 
@@ -214,7 +216,7 @@ function App() {
                 </Col>
               </Row>
 
-              <Row>
+              <Row className="overflow-auto">
                 {isLoading ?
                   <div>
                     <Spinner animation="border" role="status" />
@@ -243,7 +245,7 @@ function App() {
                   </Col>
                 </Row>
 
-                <Row className="mb-3">
+                <Row className="mb-3 overflow-auto">
                   {isLoading ?
                     <div>
                       <Spinner animation="border" role="status" />
@@ -267,24 +269,49 @@ function App() {
           <Wave2 />
 
           <Container>
-            <Row>
-              <Col className="text-center">
-                <h1>Top Genres</h1>
-              </Col>
-            </Row>
+            <div className="py-5">
 
-            <Row>
-              <Col className="text-center">
-                <GenreChart topGenreJson={topGenre} />
-              </Col>
-            </Row>
+              <Row className="mb-3">
+                <Col>
+                  <h1 className="text-center">Top Genres</h1>
+                </Col>
+              </Row>
 
+              <Row>
+                <Col className="text-center overflow-auto">
+                  {isLoading ?
+                    <div>
+                      <Spinner animation="border" role="status" />
+                      <p className="text-white">Getting your data...</p>
+                    </div>
+                    : null}
+
+                  {topGenre.length ?
+                    <GenreChart topGenreJson={topGenre} />
+                    : null}
+                </Col>
+              </Row>
+
+              <Row>
+                <form onSubmit={getTopGenres}>
+                  <button className="btn btn-secondary" type={"submit"}>Get top genres</button>
+                </form>
+              </Row>
+
+            </div>
+          </Container>
+
+          <Wave1 />
+
+          <div className="bg-dark py-3">
+          <Container>
             <Row>
-              <form onSubmit={getTopGenres}>
-                <button className="btn btn-secondary" type={"submit"}>Get top genres</button>
-              </form>
+              <Col className="text-light text-center">
+              <p>Made by Ben Oldham, find me on <a className="link-light" href="https://github.com/ben-oldham1">GitHub</a> / <a className="link-light" href="https://www.linkedin.com/in/ben-oldham1">LinkedIn</a></p>
+              </Col>
             </Row>
           </Container>
+          </div>
 
         </>
       }
