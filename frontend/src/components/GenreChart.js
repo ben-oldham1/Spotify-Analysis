@@ -18,17 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// import '../node_modules/react-vis/dist/style.css';
-import { RadialChart } from 'react-vis';
-
 import React from 'react';
-import { format } from 'd3-format';
 
-// import RadarChart from 'radar-chart';
+import { Treemap } from 'react-vis';
 
-export default function GenreChart(props) {
+function buGetData(props) {
 
-  const topGenreJson = props.topGenreJson;
+  let topGenreJson = props.topGenreJson;
 
   // Create an empty object to store the genre counts
   let genreCounts = {};
@@ -55,35 +51,59 @@ export default function GenreChart(props) {
 
   let genreNames = Object.keys(genreCounts);
 
-  let chartData = [];
+  let chartData = {
+    "children": []
+  };
 
   for (let i = 0; i < genreNames.length; i++) {
-    chartData.push({
-      'name': genreNames[i],
-      'angle': genreCounts[genreNames[i]],
-      'color': '#89DAC1'
+    chartData["children"].push({
+      'name': genreNames[i].toUpperCase(),
+      'size': genreCounts[genreNames[i]],
+      'severity': 0
     });
   }
 
-  console.log(chartData)
-
-  return (
-    <RadialChart
-      colorType={'literal'}
-      colorDomain={[0, 100]}
-      colorRange={[0, 10]}
-      margin={{ top: 100 }}
-      getLabel={d => d.name}
-      data={chartData}
-      labelsRadiusMultiplier={1.2}
-      labelsStyle={{ fontSize: 12, fill: '#222' }}
-      radius={250}
-      innerRadius={175}
-      showLabels
-      animation
-      style={{ stroke: '#fff', strokeWidth: 2 }}
-      width={800}
-      height={800}
-    />
-  );
+  return chartData;
 }
+
+class GenreChart extends React.Component {
+  state = {
+    hoveredNode: false,
+    buTreemapData: buGetData(this.props)
+  };
+  buIncidentSeverityColors = [
+    '#78a388'
+  ]
+
+  render() {
+    const treeProps = {
+      animation: {
+        damping: 9,
+        stiffness: 300
+      },
+      className: 'mx-auto',
+      data: this.state.buTreemapData,
+      height: 600,
+      width: 1100,
+      hideRootNode: true,
+      mode: 'resquarify',
+      colorType: 'literal',
+      getLabel: x => x.name,
+      colorRange: ['#e0e0e0'],
+      // getSize: x => x.apCount,
+      getColor: x => this.buIncidentSeverityColors[x.severity],
+      renderMode: 'DOM',
+      padding: 10,
+      margin: 0
+    };
+    return (
+      <div className="dynamic-treemap-example">
+        <div className="bu-nested-tree">
+          <Treemap {...treeProps} />
+        </div>
+      </div>
+    );
+  }
+}
+
+export default GenreChart;
