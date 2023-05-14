@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 
-import TopArtistsTable from "./components/TopArtistsTable";
 import AlertDismissible from "./components/Alert";
 import TopArtists from "./components/TopArtists";
 import TopTracks from "./components/TopTracks";
 import GenreChart from "./components/GenreChart";
+import SettingsModal from './components/SettingsModal';
 
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -58,6 +58,7 @@ function App() {
 
   }, [])
 
+
   // Function to log the user into Spotify
   function login() {
     // Construct the authorisation URL, where users can grant my app access to spotify
@@ -67,11 +68,7 @@ function App() {
     window.location.href = authUrl;
   }
 
-  // Removes the authorisation token, thus logging the user out from Spotify
-  const logout = () => {
-    setToken("")
-    window.sessionStorage.removeItem("token")
-  }
+
 
 
   // ========== DATA FETCHING LOGIC ==========
@@ -83,15 +80,10 @@ function App() {
   const [topTracks, setTopTracks] = useState([])
   const [topGenre, setTopGenre] = useState([])
 
-
-  // Gets the top artists for a user
-  const getTopArtists = async (e) => {
-    e.preventDefault()
-
-    // Renders a loading message while we get the data
+  // Function to fetch top artists data
+  const fetchTopArtists = async () => {
     setIsLoading(true);
 
-    // Make API call
     const { data } = await axios.get("https://api.spotify.com/v1/me/top/artists", {
       headers: {
         Authorization: `Bearer ${token}`
@@ -103,20 +95,25 @@ function App() {
       },
       timeout: 5000
     }).catch(function (error) {
-      // This will render an alert so the user knows there has been an error
       setApiError(true)
       setIsLoading(false);
     })
 
-    // Store the response in TopArtists state
     setTopArtists(data['items'])
-
     setIsLoading(false);
   }
 
-  // Gets the top artists for a user
-  const getTopGenres = async (e) => {
-    e.preventDefault()
+  // Call the fetchTopArtists function after the token is set
+  useEffect(() => {
+    if (token) {
+      fetchTopArtists();
+      getTopGenres();
+      getTopTracks();
+    }
+  }, [token])
+
+  // Gets the top genres for a user
+  const getTopGenres = async () => {
 
     // Renders a loading message while we get the data
     setIsLoading(true);
@@ -140,13 +137,11 @@ function App() {
 
     // Store the response in TopArtists state
     setTopGenre(data['items'])
-
     setIsLoading(false);
   }
 
   // Gets the top tracks for a user
-  const getTopTracks = async (e) => {
-    e.preventDefault()
+  const getTopTracks = async () => {
 
     // Renders a loading message while we get the data
     setIsLoading(true);
@@ -170,7 +165,6 @@ function App() {
 
     // Store the response in TopArtists state
     setTopTracks(data['items'])
-
     setIsLoading(false);
   }
 
@@ -186,7 +180,10 @@ function App() {
               Login to Spotify
             </button>
 
-            : <button className="btn btn-secondary" onClick={logout}>Logout</button>
+            : <div>
+              
+              <SettingsModal setToken={setToken} />
+            </div>
           }
 
         </div>
@@ -225,10 +222,6 @@ function App() {
                   : null}
                 <TopArtists topArtistsJson={topArtists} />
               </Row>
-
-              <form onSubmit={getTopArtists}>
-                <button className="btn btn-primary" type={"submit"}>Get top Artists</button>
-              </form>
             </div>
 
           </Container>
@@ -254,12 +247,6 @@ function App() {
                     : null}
 
                   <TopTracks topTracksJson={topTracks} />
-                </Row>
-
-                <Row>
-                  <form onSubmit={getTopTracks}>
-                    <button className="btn btn-secondary" type={"submit"}>Get top songs</button>
-                  </form>
                 </Row>
               </div>
 
@@ -292,25 +279,19 @@ function App() {
                 </Col>
               </Row>
 
-              <Row>
-                <form onSubmit={getTopGenres}>
-                  <button className="btn btn-secondary" type={"submit"}>Get top genres</button>
-                </form>
-              </Row>
-
             </div>
           </Container>
 
           <Wave1 />
 
-          <div className="bg-dark py-3">
-          <Container>
-            <Row>
-              <Col className="text-light text-center">
-              <p>Made by Ben Oldham, find me on <a className="link-light" href="https://github.com/ben-oldham1">GitHub</a> / <a className="link-light" href="https://www.linkedin.com/in/ben-oldham1">LinkedIn</a></p>
-              </Col>
-            </Row>
-          </Container>
+          <div className="bg-dark py-5">
+            <Container>
+              <Row>
+                <Col className="text-light text-center">
+                  <p>Made by Ben Oldham, find me on <a className="link-light" href="https://github.com/ben-oldham1">GitHub</a> / <a className="link-light" href="https://www.linkedin.com/in/ben-oldham1">LinkedIn</a></p>
+                </Col>
+              </Row>
+            </Container>
           </div>
 
         </>
