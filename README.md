@@ -1,6 +1,6 @@
 # Spotify Analysis React App
 
-![Spotify Analysis Screenshot](/path/to/screenshot.png)
+![Spotify Analysis Screenshot](https://github.com/ben-oldham1/spotify_analysis/blob/master/frontend/screenshots/LoginScreen.png)
 
 This is a React app that allows users to analyse their Spotify data using the Spotify Web API. Users can log in with their Spotify account, and then view and analyse their top tracks, artists, and genres.
 
