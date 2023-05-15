@@ -8,15 +8,10 @@ import TopTracks from "./components/TopTracks";
 import GenreChart from "./components/GenreChart";
 import SettingsModal from './components/SettingsModal';
 
-import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
-import Stack from 'react-bootstrap/Stack';
-
-import { Treemap } from 'react-vis';
 
 import { ReactComponent as Wave1 } from './components/Wave1.svg';
 import { ReactComponent as Wave2 } from './components/Wave2.svg';
@@ -73,6 +68,17 @@ function App() {
 
   // ========== DATA FETCHING LOGIC ==========
 
+  const [settingsData, setSettingsData] = useState({
+    "data_period": "medium_term"
+  });
+
+  const handleTermChange = (newTerm) => {
+    setSettingsData({
+      ...settingsData,
+      "data_period": newTerm
+    });
+  }
+
   const [apiError, setApiError] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
 
@@ -91,7 +97,7 @@ function App() {
       params: {
         limit: "3",
         offset: "0",
-        time_range: "medium_term"
+        time_range: settingsData["data_period"]
       },
       timeout: 5000
     }).catch(function (error) {
@@ -101,7 +107,16 @@ function App() {
 
     setTopArtists(data['items'])
     setIsLoading(false);
-  }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchTopArtists();
+      getTopGenres();
+      getTopTracks();
+    }
+  }, [settingsData.data_period]);
+
 
   // Call the fetchTopArtists function after the token is set
   useEffect(() => {
@@ -126,7 +141,7 @@ function App() {
       params: {
         limit: "8",
         offset: "0",
-        time_range: "medium_term"
+        time_range: settingsData["data_period"]
       },
       timeout: 5000
     }).catch(function (error) {
@@ -154,7 +169,7 @@ function App() {
       params: {
         limit: "6",
         offset: "0",
-        time_range: "medium_term"
+        time_range: settingsData["data_period"]
       },
       timeout: 5000
     }).catch(function (error) {
@@ -181,8 +196,12 @@ function App() {
             </button>
 
             : <div>
-              
-              <SettingsModal setToken={setToken} />
+
+              <SettingsModal
+                setToken={setToken}
+                selectedTerm={settingsData.data_period}
+                onTermChange={handleTermChange}
+              />
             </div>
           }
 
