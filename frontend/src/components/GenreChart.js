@@ -31,23 +31,21 @@ function buGetData(props) {
 
   // Loop through each artist in the topGenreJson variable
   for (let i = 0; i < topGenreJson.length; i++) {
+
     // Loop through each genre in the artist's genres array
     for (let j = 0; j < topGenreJson[i].genres.length; j++) {
       // If the genre is not in the genreCounts object, add it with a count of 1
       if (!(topGenreJson[i].genres[j] in genreCounts)) {
         genreCounts[topGenreJson[i].genres[j]] = 1;
       }
+
       // If the genre is already in the genreCounts object, increment its count
       else {
         genreCounts[topGenreJson[i].genres[j]] += 1;
       }
+
     }
   }
-
-
-  // Output the chartData array in the specified format
-  console.log('genreCounts');
-  console.log(genreCounts);
 
   let genreNames = Object.keys(genreCounts);
 
@@ -55,11 +53,27 @@ function buGetData(props) {
     "children": []
   };
 
+  // Takes the size of the tile and returns a colour based on that
+  function getColour (size) {
+    if (size == 1 ) {
+      return "#AAC5B4"
+    } 
+    else if (size == 2 ) {
+      return "#92B59F"
+    } else if (size == 3 ) {
+      return "#79A489"
+    } 
+    else {
+      return "#639274"
+    }
+  }
+
   for (let i = 0; i < genreNames.length; i++) {
     chartData["children"].push({
       'name': genreNames[i].toUpperCase(),
       'size': genreCounts[genreNames[i]],
-      'severity': 0
+      // getColour takes the size and sets a colour based on that
+      'colour': getColour(genreCounts[genreNames[i]])
     });
   }
 
@@ -71,9 +85,6 @@ class GenreChart extends React.Component {
     hoveredNode: false,
     buTreemapData: buGetData(this.props)
   };
-  buIncidentSeverityColors = [
-    '#78a388'
-  ]
 
   render() {
     const treeProps = {
@@ -91,7 +102,7 @@ class GenreChart extends React.Component {
       getLabel: x => x.name,
       colorRange: ['#e0e0e0'],
       // getSize: x => x.apCount,
-      getColor: x => this.buIncidentSeverityColors[x.severity],
+      getColor: x => x.colour,
       renderMode: 'DOM',
       padding: 10,
       margin: 0
