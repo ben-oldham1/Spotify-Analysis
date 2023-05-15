@@ -22,9 +22,7 @@ import React from 'react';
 
 import { Treemap } from 'react-vis';
 
-function buGetData(props) {
-
-  let topGenreJson = props.topGenreJson;
+function buGetData(topGenreJson) {
 
   // Create an empty object to store the genre counts
   let genreCounts = {};
@@ -54,15 +52,15 @@ function buGetData(props) {
   };
 
   // Takes the size of the tile and returns a colour based on that
-  function getColour (size) {
-    if (size == 1 ) {
+  function getColour(size) {
+    if (size == 1) {
       return "#AAC5B4"
-    } 
-    else if (size == 2 ) {
+    }
+    else if (size == 2) {
       return "#92B59F"
-    } else if (size == 3 ) {
+    } else if (size == 3) {
       return "#79A489"
-    } 
+    }
     else {
       return "#639274"
     }
@@ -83,8 +81,14 @@ function buGetData(props) {
 class GenreChart extends React.Component {
   state = {
     hoveredNode: false,
-    buTreemapData: buGetData(this.props)
+    buTreemapData: buGetData(this.props.topGenreJson)
   };
+
+  componentDidUpdate(prevProps) {
+    if (this.props.topGenreJson !== prevProps.topGenreJson) {
+      this.setState({ buTreemapData: buGetData(this.props.topGenreJson) });
+    }
+  }
 
   render() {
     const treeProps = {
