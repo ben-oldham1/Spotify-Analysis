@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
+import { Form, Row, Col } from 'react-bootstrap';
 
 function SettingsModal(props) {
     const [show, setShow] = useState(false);
@@ -16,6 +16,10 @@ function SettingsModal(props) {
         window.sessionStorage.removeItem("token")
     }
 
+    const handleTermChange = (e) => {
+        props.onTermChange(e.target.value);
+    };
+
     return (
         <>
             <Button variant="secondary" onClick={handleShow}>
@@ -29,11 +33,46 @@ function SettingsModal(props) {
                 </Modal.Header>
 
                 <Modal.Body>
-                    <Form.Select aria-label="Default select example">
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                    </Form.Select>
+                    <Row>
+                        <div>
+                            How far back should we analyse?
+                        </div>
+                    </Row>
+
+                    <Form>
+                        <Form.Group as={Row}>
+                            <Col sm={10}>
+                                <Form.Check
+                                    type="radio"
+                                    label="Short-term"
+                                    name="term"
+                                    id="short-term"
+                                    value="short_term"
+                                    checked={props.selectedTerm === 'short_term'}
+                                    onChange={handleTermChange}
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    label="Medium-term"
+                                    name="term"
+                                    id="medium-term"
+                                    value="medium_term"
+                                    checked={props.selectedTerm === 'medium_term'}
+                                    onChange={handleTermChange}
+                                />
+                                <Form.Check
+                                    type="radio"
+                                    label="Long-term"
+                                    name="term"
+                                    id="long-term"
+                                    value="long_term"
+                                    checked={props.selectedTerm === 'long_term'}
+                                    onChange={handleTermChange}
+                                />
+                            </Col>
+                        </Form.Group>
+                    </Form>
+
                 </Modal.Body>
 
                 <Modal.Footer>
