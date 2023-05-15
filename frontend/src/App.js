@@ -307,7 +307,7 @@ function App() {
             <Container>
               <Row>
                 <Col className="text-light text-center">
-                  <p>Made by Ben Oldham, find me on <a className="link-light" href="https://github.com/ben-oldham1">GitHub</a> / <a className="link-light" href="https://www.linkedin.com/in/ben-oldham1">LinkedIn</a></p>
+                  <p>Made by Ben Oldham, find me on <a className="link-light" href="https://github.com/ben-oldham1">GitHub</a></p>
                 </Col>
               </Row>
             </Container>
