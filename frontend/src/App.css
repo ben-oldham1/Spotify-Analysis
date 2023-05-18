@@ -5,9 +5,9 @@
 }
 
 .grow:hover {
-    -webkit-transform: scale(0.90);
-    -ms-transform: scale(0.90);
-    transform: scale(0.90);
+    -webkit-transform: scale(0.92);
+    -ms-transform: scale(0.92);
+    transform: scale(0.92);
     transition: 0.5s ease;
 }
 

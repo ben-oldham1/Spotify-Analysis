@@ -31,7 +31,10 @@ function App() {
   // ========== AUTHENTICATION LOGIC ==========
 
   const CLIENT_ID = "268fc0cf3a024f2a8b409bbdb8095567";
-  const REDIRECT_URI = "https://spotify-analysis-1.vercel.app/";
+
+  // const REDIRECT_URI = "https://spotify-analysis-1.vercel.app/";
+  const REDIRECT_URI = "http://localhost:3000/";
+
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
   const RESPONSE_TYPE = "token";
   const SCOPE = "user-top-read";
@@ -225,8 +228,8 @@ function App() {
               : null
             }
 
-            <div className="py-5">
-              <Row className="mb-3">
+            <div className="py-5 my-5">
+              <Row className="mb-5">
                 <Col>
                   <h1 className="text-center">Top Artists</h1>
                 </Col>
@@ -245,13 +248,11 @@ function App() {
 
           </Container>
 
-          <Wave1 />
-
           <div className="bg-dark">
             <Container>
 
-              <div className="py-5">
-                <Row className="mb-3">
+              <div className="py-5 my-5">
+                <Row className="mb-5">
                   <Col>
                     <h1 className="text-center text-white">Top Tracks</h1>
                   </Col>
@@ -271,8 +272,6 @@ function App() {
 
             </Container>
           </div>
-
-          <Wave2 />
 
           <Container>
             <div className="py-5">
@@ -300,8 +299,6 @@ function App() {
 
             </div>
           </Container>
-
-          <Wave1 />
 
           <div className="bg-dark py-5">
             <Container>
