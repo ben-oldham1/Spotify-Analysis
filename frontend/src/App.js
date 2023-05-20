@@ -18,9 +18,13 @@ function App() {
 
   // ========== AUTHENTICATION LOGIC ==========
 
-  // Necessary data values for the spotify API
+  
+  // Redirect parameter for the spotify API
+  const REDIRECT_URI = "https://spotify-analysis-1.vercel.app/";
+  // const REDIRECT_URI = "http://localhost:3000/";
+  
+  // Other parameters for the spotify API
   const CLIENT_ID = "268fc0cf3a024f2a8b409bbdb8095567";
-  const REDIRECT_URI = "http://localhost:3000/";
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
   const RESPONSE_TYPE = "token";
   const SCOPE = "user-top-read";
