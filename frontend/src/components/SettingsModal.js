@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { Form, Row, Col } from 'react-bootstrap';
+import { Row, Col, Container } from 'react-bootstrap';
+import Form from 'react-bootstrap/Form';
 
 function SettingsModal(props) {
     const [show, setShow] = useState(false);
@@ -33,15 +34,16 @@ function SettingsModal(props) {
                 </Modal.Header>
 
                 <Modal.Body>
-                    <Row>
-                        <div>
-                            How far back should we analyse?
-                        </div>
-                    </Row>
+                    <Container>
+                        <Row className='mb-1'>
+                            <div>
+                                How far back should we analyse?
+                            </div>
+                        </Row>
 
-                    <Form>
-                        <Form.Group as={Row}>
-                            <Col sm={10}>
+                        <Row className='mb-3'>
+                            <Form>
+
                                 <Form.Check
                                     type="radio"
                                     label="Short-term"
@@ -69,16 +71,24 @@ function SettingsModal(props) {
                                     checked={props.selectedTerm === 'long_term'}
                                     onChange={handleTermChange}
                                 />
-                            </Col>
-                        </Form.Group>
-                    </Form>
+                            </Form>
+                        </Row>
 
+                        <Row className='mb-2'>
+                            <div>
+                                Logout?
+                            </div>
+                        </Row>
+                        <Row className='mb-1'>
+                            <Button variant="outline-danger" onClick={logout}>
+                                Logout
+                            </Button>
+                        </Row>
+
+                    </Container>
                 </Modal.Body>
 
                 <Modal.Footer>
-                    <Button variant="danger" onClick={logout}>
-                        Logout
-                    </Button>
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
