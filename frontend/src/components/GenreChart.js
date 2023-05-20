@@ -17,87 +17,108 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
-import React from 'react';
-
+import React from "react";
+import axios from "axios";
 import { Treemap } from 'react-vis';
-
-function buGetData(topGenreJson) {
-
-  // Create an empty object to store the genre counts
-  let genreCounts = {};
-
-  // Loop through each artist in the topGenreJson variable
-  for (let i = 0; i < topGenreJson.length; i++) {
-
-    // Loop through each genre in the artist's genres array
-    for (let j = 0; j < topGenreJson[i].genres.length; j++) {
-      // If the genre is not in the genreCounts object, add it with a count of 1
-      if (!(topGenreJson[i].genres[j] in genreCounts)) {
-        genreCounts[topGenreJson[i].genres[j]] = 1;
-      }
-
-      // If the genre is already in the genreCounts object, increment its count
-      else {
-        genreCounts[topGenreJson[i].genres[j]] += 1;
-      }
-
-    }
-  }
-
-  let genreNames = Object.keys(genreCounts);
-
-  let chartData = {
-    "children": []
-  };
-
-  // Takes the size of the tile and returns a colour based on that
-  function getColour(size) {
-    if (size == 1) {
-      return "#AAC5B4"
-    }
-    else if (size == 2) {
-      return "#92B59F"
-    } else if (size == 3) {
-      return "#79A489"
-    }
-    else {
-      return "#639274"
-    }
-  }
-
-  for (let i = 0; i < genreNames.length; i++) {
-    chartData["children"].push({
-      'name': genreNames[i].toUpperCase(),
-      'size': genreCounts[genreNames[i]],
-      // getColour takes the size and sets a colour based on that
-      'colour': getColour(genreCounts[genreNames[i]])
-    });
-  }
-
-  return chartData;
-}
 
 class GenreChart extends React.Component {
   state = {
     hoveredNode: false,
-    buTreemapData: buGetData(this.props.topGenreJson)
+    topGenres: [],
+    topGenresData: {}
   };
 
+  async getTopGenres() {
+    const { token, settingsData, setIsLoading, setApiError } = this.props;
+
+    setIsLoading(true);
+
+    try {
+      const { data } = await axios.get("https://api.spotify.com/v1/me/top/artists", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          limit: "8",
+          offset: "0",
+          time_range: settingsData["data_period"]
+        },
+        timeout: 5000
+      });
+
+      this.setState({ topGenres: data['items'], topGenresData: this.buGetData(data['items']) });
+      setIsLoading(false);
+    } catch (error) {
+      setApiError(true);
+      setIsLoading(false);
+    }
+  }
+
+  buGetData(topGenreJson) {
+    let genreCounts = {};
+
+    for (let i = 0; i < topGenreJson.length; i++) {
+      for (let j = 0; j < topGenreJson[i].genres.length; j++) {
+        if (!(topGenreJson[i].genres[j] in genreCounts)) {
+          genreCounts[topGenreJson[i].genres[j]] = 1;
+        } else {
+          genreCounts[topGenreJson[i].genres[j]] += 1;
+        }
+      }
+    }
+
+    let genreNames = Object.keys(genreCounts);
+
+    let chartData = {
+      "children": []
+    };
+
+    function getColour(size) {
+      if (size === 1) {
+        return "#AAC5B4";
+      } else if (size === 2) {
+        return "#92B59F";
+      } else if (size === 3) {
+        return "#79A489";
+      } else {
+        return "#639274";
+      }
+    }
+
+    for (let i = 0; i < genreNames.length; i++) {
+      chartData["children"].push({
+        'name': genreNames[i].toUpperCase(),
+        'size': genreCounts[genreNames[i]],
+        'colour': getColour(genreCounts[genreNames[i]])
+      });
+    }
+
+    return chartData;
+  }
+
+  componentDidMount() {
+    const { token } = this.props;
+    if (token) {
+      this.getTopGenres();
+    }
+  }
+
   componentDidUpdate(prevProps) {
-    if (this.props.topGenreJson !== prevProps.topGenreJson) {
-      this.setState({ buTreemapData: buGetData(this.props.topGenreJson) });
+    const { settingsData } = this.props;
+    if (settingsData !== prevProps.settingsData) {
+      this.getTopGenres();
     }
   }
 
   render() {
+    const { topGenresData } = this.state;
     const treeProps = {
       animation: {
         damping: 9,
         stiffness: 300
       },
       className: 'mx-auto',
-      data: this.state.buTreemapData,
+      data: topGenresData,
       height: 600,
       width: 1100,
       hideRootNode: true,
@@ -105,19 +126,22 @@ class GenreChart extends React.Component {
       colorType: 'literal',
       getLabel: x => x.name,
       colorRange: ['#e0e0e0'],
-      // getSize: x => x.apCount,
       getColor: x => x.colour,
       renderMode: 'DOM',
       padding: 10,
       margin: 0
     };
     return (
-      <div className="dynamic-treemap-example">
-        <div className="bu-nested-tree">
-          <Treemap {...treeProps} />
-        </div>
-      </div>
-    );
+      <>
+        {topGenresData && (
+          <div className="dynamic-treemap-example">
+            <div className="bu-nested-tree">
+              <Treemap {...treeProps} />
+            </div>
+          </div>
+        )}
+      </>
+    );    
   }
 }
 
