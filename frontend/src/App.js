@@ -12,128 +12,90 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
-
-import axios from "axios";
+import Navbar from 'react-bootstrap/Navbar';
 
 function App() {
-  // usestate for setting a javascript
-  // object for storing and using data
-  const [data, setdata] = useState({
-    name: "",
-    age: 0,
-    date: "",
-    programming: "",
-  });
 
   // ========== AUTHENTICATION LOGIC ==========
 
+  // Necessary data values for the spotify API
   const CLIENT_ID = "268fc0cf3a024f2a8b409bbdb8095567";
-
-  // const REDIRECT_URI = "https://spotify-analysis-1.vercel.app/";
   const REDIRECT_URI = "http://localhost:3000/";
-
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
   const RESPONSE_TYPE = "token";
   const SCOPE = "user-top-read";
 
-  const [token, setToken] = useState("")
+  // State variable to store the access token
+  const [token, setToken] = useState("");
 
+  // Use effect to handle authentication logic
   useEffect(() => {
-    const hash = window.location.hash
-    let token = window.sessionStorage.getItem("token")
+    const hash = window.location.hash;
+    let token = window.sessionStorage.getItem("token");
 
+    // Check if token is not present and the URL contains a hash
     if (!token && hash) {
-      token = hash.substring(1).split("&").find(elem => elem.startsWith("access_token")).split("=")[1]
+      // Extract the access token from the hash
+      token = hash
+        .substring(1)
+        .split("&")
+        .find((elem) => elem.startsWith("access_token"))
+        .split("=")[1];
 
-      window.location.hash = ""
-      window.sessionStorage.setItem("token", token)
+      // Clear the hash from the URL
+      window.location.hash = "";
+
+      // Store the token in session storage
+      window.sessionStorage.setItem("token", token);
     }
 
-    setToken(token)
-
-  }, [])
-
+    // Set the access token
+    setToken(token);
+  }, []);
 
   // Function to log the user into Spotify
   function login() {
-    // Construct the authorisation URL, where users can grant my app access to spotify
+    // Construct the authorization URL for Spotify authentication
     const authUrl = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}`;
 
-    // Redirect page to the URL above
+    // Redirect the page to the authorization URL
     window.location.href = authUrl;
   }
 
-
-
-
   // ========== DATA FETCHING LOGIC ==========
 
+  // State variable for settings data
   const [settingsData, setSettingsData] = useState({
-    "data_period": "medium_term"
+    data_period: "medium_term",
   });
 
+  // Function to handle term change
   const handleTermChange = (newTerm) => {
     setSettingsData({
       ...settingsData,
-      "data_period": newTerm
+      data_period: newTerm,
     });
-  }
+  };
 
-  const [apiError, setApiError] = useState(false)
+  // State variables for API error and loading state
+  const [apiError, setApiError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const [topGenre, setTopGenre] = useState([])
-
-
-  useEffect(() => {
-    if (token) {
-      getTopGenres();
-    }
-  }, [settingsData.data_period]);
-
-
-  // Call the fetchTopArtists function after the token is set
-  useEffect(() => {
-    if (token) {
-      getTopGenres();
-    }
-  }, [token])
-
-  // Gets the top genres for a user
-  const getTopGenres = async () => {
-
-    // Renders a loading message while we get the data
-    setIsLoading(true);
-
-    // Make API call
-    const { data } = await axios.get("https://api.spotify.com/v1/me/top/artists", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      params: {
-        limit: "8",
-        offset: "0",
-        time_range: settingsData["data_period"]
-      },
-      timeout: 5000
-    }).catch(function (error) {
-      // This will render an alert so the user knows there has been an error
-      setApiError(true)
-      setIsLoading(false);
-    })
-
-    // Store the response in TopArtists state
-    setTopGenre(data['items'])
-    setIsLoading(false);
-  }
-
 
   return (
     <div className="App">
 
       <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
-          <a class="navbar-brand">Spotify Analyser</a>
+          <Navbar.Brand>
+            <img
+              alt="Logo"
+              src="/logo192.png"
+              width="25"
+              height="25"
+              className="d-inline-block align-center"
+            />{' '}
+            React Bootstrap
+          </Navbar.Brand>
 
           {!token ?
             <button className="btn btn-secondary" onClick={login}>
@@ -243,9 +205,12 @@ function App() {
                     </div>
                     : null}
 
-                  {topGenre.length ?
-                    <GenreChart topGenreJson={topGenre} />
-                    : null}
+                    <GenreChart
+                      setApiError={setApiError}
+                      setIsLoading={setIsLoading}
+                      settingsData={settingsData}
+                      token={token}
+                    />
                 </Col>
               </Row>
 
@@ -256,7 +221,9 @@ function App() {
             <Container>
               <Row>
                 <Col className="text-light text-center">
-                  <p>Made by Ben Oldham, find me on <a className="link-light" href="https://github.com/ben-oldham1">GitHub</a></p>
+                  <p className="my-0">
+                    Made by Ben Oldham, find me on <a className="link-light" href="https://github.com/ben-oldham1">GitHub</a>
+                  </p>
                 </Col>
               </Row>
             </Container>
