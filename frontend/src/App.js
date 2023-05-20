@@ -13,9 +13,6 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
 
-import { ReactComponent as Wave1 } from './components/Wave1.svg';
-import { ReactComponent as Wave2 } from './components/Wave2.svg';
-
 import axios from "axios";
 
 function App() {
@@ -85,38 +82,12 @@ function App() {
   const [apiError, setApiError] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
 
-  const [topArtists, setTopArtists] = useState([])
-  const [topTracks, setTopTracks] = useState([])
   const [topGenre, setTopGenre] = useState([])
 
-  // Function to fetch top artists data
-  const fetchTopArtists = async () => {
-    setIsLoading(true);
-
-    const { data } = await axios.get("https://api.spotify.com/v1/me/top/artists", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      params: {
-        limit: "3",
-        offset: "0",
-        time_range: settingsData["data_period"]
-      },
-      timeout: 5000
-    }).catch(function (error) {
-      setApiError(true)
-      setIsLoading(false);
-    })
-
-    setTopArtists(data['items'])
-    setIsLoading(false);
-  };
 
   useEffect(() => {
     if (token) {
-      fetchTopArtists();
       getTopGenres();
-      getTopTracks();
     }
   }, [settingsData.data_period]);
 
@@ -124,9 +95,7 @@ function App() {
   // Call the fetchTopArtists function after the token is set
   useEffect(() => {
     if (token) {
-      fetchTopArtists();
       getTopGenres();
-      getTopTracks();
     }
   }, [token])
 
@@ -158,33 +127,6 @@ function App() {
     setIsLoading(false);
   }
 
-  // Gets the top tracks for a user
-  const getTopTracks = async () => {
-
-    // Renders a loading message while we get the data
-    setIsLoading(true);
-
-    // Make API call
-    const { data } = await axios.get("https://api.spotify.com/v1/me/top/tracks", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      params: {
-        limit: "6",
-        offset: "0",
-        time_range: settingsData["data_period"]
-      },
-      timeout: 5000
-    }).catch(function (error) {
-      // This will render an alert so the user knows there has been an error
-      setApiError(true)
-      setIsLoading(false);
-    })
-
-    // Store the response in TopArtists state
-    setTopTracks(data['items'])
-    setIsLoading(false);
-  }
 
   return (
     <div className="App">
@@ -242,7 +184,12 @@ function App() {
                     <p>Getting your data...</p>
                   </div>
                   : null}
-                <TopArtists topArtistsJson={topArtists} />
+                <TopArtists
+                  setApiError={setApiError}
+                  setIsLoading={setIsLoading}
+                  settingsData={settingsData}
+                  token={token}
+                />
               </Row>
             </div>
 
@@ -252,13 +199,13 @@ function App() {
             <Container>
 
               <div className="py-5 my-5">
-                <Row className="mb-5">
+                <Row className="my-5">
                   <Col>
                     <h1 className="text-center text-white">Top Tracks</h1>
                   </Col>
                 </Row>
 
-                <Row className="mb-3 overflow-auto">
+                <Row className="overflow-auto">
                   {isLoading ?
                     <div>
                       <Spinner animation="border" role="status" />
@@ -266,7 +213,12 @@ function App() {
                     </div>
                     : null}
 
-                  <TopTracks topTracksJson={topTracks} />
+                  <TopTracks
+                    setApiError={setApiError}
+                    setIsLoading={setIsLoading}
+                    settingsData={settingsData}
+                    token={token}
+                  />
                 </Row>
               </div>
 
@@ -274,9 +226,9 @@ function App() {
           </div>
 
           <Container>
-            <div className="py-5">
+            <div className="py-5 my-5">
 
-              <Row className="mb-3">
+              <Row className="mb-5">
                 <Col>
                   <h1 className="text-center">Top Genres</h1>
                 </Col>
