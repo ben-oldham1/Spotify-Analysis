@@ -99,7 +99,7 @@ function App() {
               height="25"
               className="d-inline-block align-center"
             />{' '}
-            React Bootstrap
+            Spotify Analysis
           </Navbar.Brand>
 
           {!token ?
