@@ -10,11 +10,6 @@ You can view the deployed app at [https://spotify-analysis-1.vercel.app](https:/
 
 The app uses the following dependencies:
 - React (JS + JSX)
-- Flask (backend server)
-- Python
 - Axios (for making API calls)
 - Spotify Web API
 - React-vis (charts & visualisation) 
-
-## Screenshots
-![Spotify Analysis Screenshot](https://github.com/ben-oldham1/spotify_analysis/blob/master/frontend/screenshots/LoginScreen.png)
