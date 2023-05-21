@@ -66,6 +66,8 @@ function App() {
     window.location.href = authUrl;
   }
 
+
+  
   // ========== DATA FETCHING LOGIC ==========
 
   // State variable for settings data
