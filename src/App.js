@@ -17,7 +17,6 @@ import Navbar from 'react-bootstrap/Navbar';
 function App() {
 
   // ========== AUTHENTICATION LOGIC ==========
-
   
   // Redirect parameter for the spotify API
   const REDIRECT_URI = "https://spotify-analysis-1.vercel.app/";
@@ -229,6 +228,8 @@ function App() {
                 <Col className="text-light text-center">
                   <p className="my-0">
                     Made by Ben Oldham, find me on <a className="link-light" href="https://github.com/ben-oldham1">GitHub</a>
+                    <br></br>
+                    Powered by Spotify API
                   </p>
                 </Col>
               </Row>
@@ -237,8 +238,6 @@ function App() {
 
         </>
       }
-
-
 
     </div>
   );
