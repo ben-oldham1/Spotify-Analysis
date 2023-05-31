@@ -8,63 +8,31 @@ import TopTracks from "./components/TopTracks";
 import GenreChart from "./components/GenreChart";
 import SettingsModal from './components/SettingsModal';
 
+import { handleAuthentication, getAuthorisationUrl } from "./components/Authorisation";
+
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Spinner from 'react-bootstrap/Spinner';
 import Navbar from 'react-bootstrap/Navbar';
 
+import spotify_logo from './media/spotify_logo.png';
+
 function App() {
 
   // ========== AUTHENTICATION LOGIC ==========
   
-  // Redirect parameter for the spotify API
-  const REDIRECT_URI = "https://spotify-analysis-1.vercel.app/";
-  // const REDIRECT_URI = "http://localhost:3000/";
-  
-  // Other parameters for the spotify API
-  const CLIENT_ID = "268fc0cf3a024f2a8b409bbdb8095567";
-  const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
-  const RESPONSE_TYPE = "token";
-  const SCOPE = "user-top-read";
-
-  // State variable to store the access token
   const [token, setToken] = useState("");
 
-  // Use effect to handle authentication logic
   useEffect(() => {
-    const hash = window.location.hash;
-    let token = window.sessionStorage.getItem("token");
-
-    // Check if token is not present and the URL contains a hash
-    if (!token && hash) {
-      // Extract the access token from the hash
-      token = hash
-        .substring(1)
-        .split("&")
-        .find((elem) => elem.startsWith("access_token"))
-        .split("=")[1];
-
-      // Clear the hash from the URL
-      window.location.hash = "";
-
-      // Store the token in session storage
-      window.sessionStorage.setItem("token", token);
-    }
-
-    // Set the access token
+    const token = handleAuthentication();
     setToken(token);
   }, []);
 
-  // Function to log the user into Spotify
   function login() {
-    // Construct the authorization URL for Spotify authentication
-    const authUrl = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=${SCOPE}`;
-
-    // Redirect the page to the authorization URL
+    const authUrl = getAuthorisationUrl();
     window.location.href = authUrl;
   }
-
 
   
   // ========== DATA FETCHING LOGIC ==========
@@ -132,7 +100,8 @@ function App() {
 
             {apiError ?
               <Row>
-                <AlertDismissible headerText="Error" bodyText="An error has occcured while accessing your Spotify data. Try again!" apiError={apiError} setApiError={setApiError} />
+                <AlertDismissible headerText="Error" bodyText="An error has occcured while accessing your Spotify data. 
+                Try logging out and back in again!" apiError={apiError} setApiError={setApiError} />
               </Row>
               : null
             }
@@ -226,9 +195,19 @@ function App() {
             <Container>
               <Row>
                 <Col className="text-light text-center">
-                  <p className="my-0">
+                  <p>
                     Made by Ben Oldham, find me on <a className="link-light" href="https://github.com/ben-oldham1">GitHub</a>
-                    <br></br>
+                  </p>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="text-light text-center">
+                  <img src={spotify_logo} alt="Spotify logo" width={150}></img>
+                </Col>
+              </Row>
+              <Row>
+                <Col className="text-light text-center">
+                  <p>
                     Powered by Spotify API
                   </p>
                 </Col>
