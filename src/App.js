@@ -194,20 +194,20 @@ function App() {
           <div className="bg-dark py-5">
             <Container>
               <Row>
-                <Col className="text-light text-center">
-                  <p>
+                <Col>
+                  <p className="text-light text-center my-0">
                     Made by Ben Oldham, find me on <a className="link-light" href="https://github.com/ben-oldham1">GitHub</a>
                   </p>
                 </Col>
               </Row>
               <Row>
-                <Col className="text-light text-center">
+                <Col className="text-center my-3">
                   <img src={spotify_logo} alt="Spotify logo" width={150}></img>
                 </Col>
               </Row>
               <Row>
-                <Col className="text-light text-center">
-                  <p>
+                <Col>
+                  <p className="text-light text-center my-0">
                     Powered by Spotify API
                   </p>
                 </Col>
