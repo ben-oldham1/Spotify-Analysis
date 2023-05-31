@@ -32,22 +32,23 @@ function TopTracks(props) {
 
         // Store the response in TopArtists state
         setTopTracks(data['items'])
+        console.log(data['items'])
         props.setIsLoading(false);
     }
 
     useEffect(() => {
         if (props.token) {
-          getTopTracks();
+            getTopTracks();
         }
-      }, [props.settingsData.data_period]);
-    
-    
-      // Call the fetchTopArtists function after the token is set
-      useEffect(() => {
+    }, [props.settingsData.data_period]);
+
+
+    // Call the fetchTopArtists function after the token is set
+    useEffect(() => {
         if (props.token) {
-          getTopTracks();
+            getTopTracks();
         }
-      }, [props.token])
+    }, [props.token])
 
     return (
         <>
@@ -55,7 +56,9 @@ function TopTracks(props) {
                 <div className='col-md-4 mb-5 text-center' key={topTrack.id}>
                     <Stack>
                         <div className='mb-3'>
-                            <img src={topTrack.album.images[0].url} className="grow" height='200px'></img>
+                            <a href={topTrack.external_urls.spotify}>
+                                <img src={topTrack.album.images[0].url} className="grow" height='200px'></img>
+                            </a>
                         </div>
                         <h3 className="text-white">{topTrack.name}</h3>
                     </Stack>
