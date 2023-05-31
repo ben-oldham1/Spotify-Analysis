@@ -51,7 +51,9 @@ function TopArtists(props) {
         <div className='col-md-4 text-center mb-5' key={topArtist.id}>
           <Stack>
             <div>
-              <img src={topArtist.images[1].url} className="grow mb-3" height='230px'></img>
+              <a href={topArtist.external_urls.spotify}>
+                <img src={topArtist.images[1].url} className="grow mb-3" height='230px'></img>
+              </a>
             </div>
             <h3>{topArtist.name}</h3>
           </Stack>
