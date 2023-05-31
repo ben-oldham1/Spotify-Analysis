@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Accordion from 'react-bootstrap/Accordion';
 import { Row, Col, Container } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
+
 
 function SettingsModal(props) {
     const [show, setShow] = useState(false);
@@ -36,9 +38,9 @@ function SettingsModal(props) {
                 <Modal.Body>
                     <Container>
                         <Row className='mb-1'>
-                            <div>
-                                How far back should we analyse?
-                            </div>
+                            <h5>
+                                Analysis period
+                            </h5>
                         </Row>
 
                         <Row className='mb-3'>
@@ -74,21 +76,24 @@ function SettingsModal(props) {
                             </Form>
                         </Row>
 
-                        <Row className='mb-2'>
-                            <div>
-                                Logout?
-                            </div>
-                        </Row>
-                        <Row className='mb-1'>
-                            <Button variant="outline-danger" onClick={logout}>
-                                Logout
-                            </Button>
+
+                        <Row className='mb-3'>
+                            <h5>Disclaimer</h5>
+                            <p>
+                                This website is developed by a third party with no affiliation to Spotify. Data is provided through the Spotify 
+                                web API. Your data is not stored by the developer(s) of this site.
+                            </p>
+
+
                         </Row>
 
                     </Container>
                 </Modal.Body>
 
                 <Modal.Footer>
+                    <Button variant="outline-danger" onClick={logout}>
+                        Logout
+                    </Button>
                     <Button variant="secondary" onClick={handleClose}>
                         Close
                     </Button>
