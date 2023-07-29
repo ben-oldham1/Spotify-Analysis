@@ -13,3 +13,10 @@ The app uses the following dependencies:
 - Axios (for making API calls)
 - Spotify Web API
 - React-vis (charts & visualisation) 
+
+## Screenshots
+
+## Login screen
+![Screenshot showing the login screen](https://github.com/ben-oldham1/spotify_analysis/blob/master/screenshots/loginScreen.png?raw=true)
+## Top artists
+![Screenshot showing the login screen](https://github.com/ben-oldham1/spotify_analysis/blob/master/screenshots/topArtists.png?raw=true)
